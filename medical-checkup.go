@@ -86,15 +86,39 @@ func remove_mcu(mcu_list *mcu_tab, x int) {
 }
 
 func search_patient_from_pack(mcu_list mcu_tab, x string) {
-
+	var count int = 1
+	for i := 0; i < mcu_list.n; i++ {
+		if mcu_list.data[i].pack.id == x {
+			fmt.Printf("%d. %s, %s\n", count, mcu_list.data[i].patient.name, mcu_list.data[i].patient.id)
+			count++
+		}
+	}
+	if count == 1 {
+		fmt.Print("No patient with that spesific pack listed")
+	}
 }
 
-func search_patient_from_period(msu_list mcu_tab, x string) {
-
+func search_patient_from_period(mcu_list mcu_tab, x string) {
+	var count int = 1
+	for i := 0; i < mcu_list.n; i++ {
+		if mcu_list.data[i].period == x {
+			fmt.Printf("%d. %s, %s\n", count, mcu_list.data[i].patient.name, mcu_list.data[i].patient.id)
+			count++
+		}
+	}
+	if count == 1 {
+		fmt.Print("No patient with that spesific period listed")
+	}
 }
 
 func search_patient(patient_list patient_tab, x string) {
-
+	for i := 0; i < patient_list.n; i++ {
+		if patient_list.data[i].id == x {
+			print_patient_detail(patient_list.data[i])
+			return
+		}
+	}
+	fmt.Print("No patient with that spesific id listed")
 }
 
 func sort_period(mcu_list *mcu_tab) {
@@ -105,14 +129,18 @@ func sort_pack(mcu_list *mcu_tab) {
 
 }
 
-func print_patient(patient_list patient_tab) {
+func print_all_patient(patient_list patient_tab) {
 
 }
 
-func print_pack(pack_list pack_tab) {
+func print_all_pack(pack_list pack_tab) {
 
 }
 
-func print_mcu(mcu_list mcu_tab) {
+func print_all_mcu(mcu_list mcu_tab) {
+
+}
+
+func print_patient_detail(x info_patient) {
 
 }
