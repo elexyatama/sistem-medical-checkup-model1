@@ -46,7 +46,66 @@ type mcu_tab struct {
 }
 
 func main() {
-	fmt.Print("yes") //blm selesai
+	var patients patient_tab
+	var packs pack_tab
+	var mcues mcu_tab
+	var input int = 99
+	for input != 7{
+		fmt.Println("------------ Medical Data ------------------")
+		print_cmd_main()
+		fmt.Scan(&input)
+		if input == 1{
+			view_mcues(mcues)
+		}else if input == 2{
+			view_patients(patients)
+		}else if input == 3{
+			view_packs(packs)
+		}else if input == 4{
+			
+		}else if input == 5{
+			
+		}else if input == 6{
+			
+		}else if input == 0{
+			
+		}else {
+			fmt.Println("Unknown input")
+			fmt.Scanln()
+		}
+	}
+}
+
+func view_mcues(mcues mcu_tab){
+	var input int = 99;
+	for input != 0{
+		fmt.Println("----------------- MCU ----------------------")
+		print_all_mcu(mcues)
+		fmt.Scan(&input)
+		if input == 1{
+			sort_period(mcues)
+		}else if input == 2{
+			sort_pack(mcues)
+		}else if input == 0{
+			fmt.Println("Returning to main menu")
+		}else {
+			fmt.Println("Unknown input")
+			fmt.Scanln()
+		}
+	}
+}
+
+func view_patients(patients patient_tab){
+	fmt.Println("--------------- Patient --------------------")
+	print_all_patient(patients)
+	fmt.Print("Press anywhere to return")
+	fmt.Scanln()
+}
+
+func view_packs(packs pack_tab){
+	fmt.Println("---------------- Packs ---------------------")
+	print_all_packs(packs)
+	fmt.Print("Press anywhere to return")
+	fmt.Scanln()	
 }
 
 func add_patient(patients *patient_tab, x info_patient) { //buat nambahin data pasien
@@ -111,7 +170,7 @@ func search_patient_from_period(mcues mcu_tab, x string) { //sequential search a
 	}
 }
 
-func search_patient(patients patient_tab, x string) { //binary search ada disini
+func search_patient(patients patient_tab, x string) int { //binary search ada disini
 	sort_patient_id(&patients)
 	low, high := 0, patients.n-1
 	found := -1
@@ -135,6 +194,7 @@ func search_patient(patients patient_tab, x string) { //binary search ada disini
 	} else { //klo ga nemu pass error msg
 		fmt.Printf("Patient with ID %s not found\n", x)
 	}
+	return found
 }
 
 func sort_period(mcues *mcu_tab) { //selection sort ada disini
@@ -201,10 +261,10 @@ func print_all_pack(packs pack_tab) { // buat prin semua list pack
 func print_all_mcu(mcues mcu_tab) { // buat print semua list mcu
 	fmt.Println("MCU Data:")
 	for i := 0; i < mcues.n; i++ {
+		fmt.Printf("Patient: %s\n", mcues.data[i].patient.name)
 		fmt.Printf("ID: %s\n", mcues.data[i].id)
 		fmt.Printf("Price: %.2f\n", mcues.data[i].price)
 		fmt.Printf("Period: %s\n", mcues.data[i].period)
-		fmt.Printf("Patient: %s\n", mcues.data[i].patient.name)
 		fmt.Printf("Pack: %s\n", mcues.data[i].pack.name)
 		fmt.Println("--------------")
 	}
@@ -217,4 +277,24 @@ func print_patient_detail(x info_patient) { // buat print detail satu pasien
 	fmt.Printf("Origin: %s\n", x.origin)
 	fmt.Printf("Age: %d\n", x.age)
 	fmt.Printf("Gender: %s\n", x.gender)
+}
+
+func print_cmd_main(){
+	fmt.Println("1. View MCU-es")
+	fmt.Println("2. View patients")
+	fmt.Println("3. View packs")
+	fmt.Println("4. Make medical check up")
+	fmt.Println("5. Search data")
+	fmt.Println("6. Edit data")
+	fmt.Println("0. Exit program")
+	fmt.Println("--------------------------------------------")
+	fmt.Print("Input : ")
+}
+
+func print_cmd_view(){
+	fmt.Println("1. Sort by period")
+	fmt.Println("2. Sort by packages")
+	fmt.Println("0. Back")
+	fmt.Println("--------------------------------------------")
+	fmt.Print("Input : ")
 }
