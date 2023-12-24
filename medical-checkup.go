@@ -50,62 +50,62 @@ func main() {
 	var packs pack_tab
 	var mcues mcu_tab
 	var input int = 99
-	for input != 7{
+	for input != 7 {
 		fmt.Println("------------ Medical Data ------------------")
 		print_cmd_main()
 		fmt.Scan(&input)
-		if input == 1{
+		if input == 1 {
 			view_mcues(mcues)
-		}else if input == 2{
+		} else if input == 2 {
 			view_patients(patients)
-		}else if input == 3{
+		} else if input == 3 {
 			view_packs(packs)
-		}else if input == 4{
-			
-		}else if input == 5{
-			
-		}else if input == 6{
-			
-		}else if input == 0{
-			
-		}else {
+		} else if input == 4 {
+			register_mcu(&mcues, packs, patients)
+		} else if input == 5 {
+
+		} else if input == 6 {
+
+		} else if input == 0 {
+
+		} else {
 			fmt.Println("Unknown input")
 			fmt.Scanln()
 		}
 	}
 }
 
-func view_mcues(mcues mcu_tab){
-	var input int = 99;
-	for input != 0{
+func view_mcues(mcues mcu_tab) {
+	var input int = 99
+	for input != 0 {
 		fmt.Println("----------------- MCU ----------------------")
 		print_all_mcu(mcues)
 		fmt.Scan(&input)
-		if input == 1{
-			sort_period(mcues)
-		}else if input == 2{
-			sort_pack(mcues)
-		}else if input == 0{
+		if input == 1 {
+			sort_period(&mcues)
+		} else if input == 2 {
+			sort_pack(&mcues)
+		} else if input == 0 {
 			fmt.Println("Returning to main menu")
-		}else {
+		} else {
 			fmt.Println("Unknown input")
 			fmt.Scanln()
 		}
 	}
 }
 
-func view_patients(patients patient_tab){
+func view_patients(patients patient_tab) {
 	fmt.Println("--------------- Patient --------------------")
 	print_all_patient(patients)
 	fmt.Print("Press anywhere to return")
 	fmt.Scanln()
 }
 
-func view_packs(packs pack_tab){
+func view_packs(packs pack_tab) {
 	fmt.Println("---------------- Packs ---------------------")
 	print_all_packs(packs)
 	fmt.Print("Press anywhere to return")
-	fmt.Scanln()	
+	fmt.Scanln()
 }
 
 func add_patient(patients *patient_tab, x info_patient) { //buat nambahin data pasien
@@ -248,7 +248,7 @@ func print_all_patient(patients patient_tab) { // buat print semua list pasien
 	}
 }
 
-func print_all_pack(packs pack_tab) { // buat prin semua list pack
+func print_all_packs(packs pack_tab) { // buat prin semua list pack
 	fmt.Println("Pack Data:")
 	for i := 0; i < packs.n; i++ {
 		fmt.Printf("Name: %s\n", packs.data[i].name)
@@ -279,7 +279,7 @@ func print_patient_detail(x info_patient) { // buat print detail satu pasien
 	fmt.Printf("Gender: %s\n", x.gender)
 }
 
-func print_cmd_main(){
+func print_cmd_main() {
 	fmt.Println("1. View MCU-es")
 	fmt.Println("2. View patients")
 	fmt.Println("3. View packs")
@@ -291,10 +291,76 @@ func print_cmd_main(){
 	fmt.Print("Input : ")
 }
 
-func print_cmd_view(){
+func print_cmd_view() {
 	fmt.Println("1. Sort by period")
 	fmt.Println("2. Sort by packages")
 	fmt.Println("0. Back")
 	fmt.Println("--------------------------------------------")
 	fmt.Print("Input : ")
+}
+
+func register_mcu(mcues *mcu_tab, packs pack_tab, patients patient_tab) {
+	// Periksa apakah ada paket medis yang tersedia
+	if packs.n == 0 {
+		fmt.Println("No medical packs available for registration.")
+		return
+	}
+
+	// Periksa apakah ada pasien yang tersedia
+	if patients.n == 0 {
+		fmt.Println("No patients available for registration.")
+		return
+	}
+
+	// Tampilkan paket medis yang tersedia untuk dipilih
+	fmt.Println("Available Medical Packs:")
+	for i := 0; i < packs.n; i++ {
+		fmt.Printf("%d. %s\n", i+1, packs.data[i].name)
+	}
+
+	// Minta pengguna untuk memilih paket
+	var selectedPackIndex int
+	fmt.Print("Select a pack (enter the corresponding number): ")
+	fmt.Scan(&selectedPackIndex)
+
+	// Validasi indeks paket yang dipilih
+	if selectedPackIndex < 1 || selectedPackIndex > packs.n {
+		fmt.Println("Invalid pack selection.")
+		return
+	}
+
+	// Tampilkan pasien yang tersedia untuk dipilih
+	fmt.Println("\nAvailable Patients:")
+	for i := 0; i < patients.n; i++ {
+		fmt.Printf("%d. %s\n", i+1, patients.data[i].name)
+	}
+
+	// Prompt user to select a patient
+	var selectedPatientIndex int
+	fmt.Print("Select a patient (enter the corresponding number): ")
+	fmt.Scan(&selectedPatientIndex)
+
+	// Validasi indeks pasien yang dipilih
+	if selectedPatientIndex < 1 || selectedPatientIndex > patients.n {
+		fmt.Println("Invalid patient selection.")
+		return
+	}
+
+	var newMCU info_mcu
+
+	fmt.Print("Enter MCU ID: ")
+	fmt.Scan(&newMCU.id)
+
+	fmt.Print("Enter MCU Price: ")
+	fmt.Scan(&newMCU.price)
+
+	fmt.Print("Enter MCU Period: ")
+	fmt.Scan(&newMCU.period)
+
+	newMCU.patient = patients.data[selectedPatientIndex-1]
+	newMCU.pack = packs.data[selectedPackIndex-1]
+
+	add_mcu(mcues, newMCU)
+
+	fmt.Printf("Medical Check-up successfully registered. MCU ID: %s\n", newMCU.id)
 }
