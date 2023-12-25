@@ -63,13 +63,15 @@ func main() {
 		} else if input == 4 {
 			register_mcu(&mcues, packs, patients)
 		} else if input == 5 {
-
+			finish_mcu(&mcues)
 		} else if input == 6 {
-
+			search_menu(mcues, patients)
+		} else if input == 7 {
+			edit_menu(&packs, &patients)
 		} else if input == 0 {
-
+			fmt.Println("Exiting program")
 		} else {
-			fmt.Println("Unknown input")
+			fmt.Println("Invalid input. Please enter a number between 0 and 7.")
 			fmt.Scanln()
 		}
 	}
@@ -148,7 +150,7 @@ func search_patient_from_pack(mcues mcu_tab, x string) { // ini buat nampilin se
 	var count int = 1
 	for i := 0; i < mcues.n; i++ { // ini ngecek dari array index 0 sampe mcues.n, mcues.n ini tu ukuran array
 		if mcues.data[i].pack.id == x { // ini ngecek kalo misalnya data.pack.id sama kae apa yang kita cari, nanti diprint detailnya dibawah
-			fmt.Printf("%d. %s, %s\n", count, mcues.data[i].patient.name, mcues.data[i].patient.id)
+			print_mcu_detail(mcues.data[i])
 			count++
 		}
 	}
@@ -161,7 +163,7 @@ func search_patient_from_period(mcues mcu_tab, x string) { //sequential search a
 	var count int = 1
 	for i := 0; i < mcues.n; i++ {
 		if mcues.data[i].period == x {
-			fmt.Printf("%d. %s, %s\n", count, mcues.data[i].patient.name, mcues.data[i].patient.id)
+			print_mcu_detail(mcues.data[i])
 			count++
 		}
 	}
@@ -170,14 +172,14 @@ func search_patient_from_period(mcues mcu_tab, x string) { //sequential search a
 	}
 }
 
-func search_patient(patients patient_tab, x string) int { //binary search ada disini
-	sort_patient_id(&patients)
+func search_patient_name(patients patient_tab, x string) int { //binary search ada disini
+	sort_patient_name(&patients)
 	low, high := 0, patients.n-1
 	found := -1
 
 	for low <= high {
 		mid := (low + high) / 2
-		curr := patients.data[mid].id
+		curr := patients.data[mid].name
 
 		if curr == x {
 			found = mid
@@ -195,6 +197,33 @@ func search_patient(patients patient_tab, x string) int { //binary search ada di
 		fmt.Printf("Patient with ID %s not found\n", x)
 	}
 	return found
+}
+
+func search_pack_id(packs pack_tab, x string) int { //sequential search disini
+	for i := 0; i < packs.n; i++ {
+		if packs.data[i].id == x {
+			return i
+		}
+	}
+	return -1
+}
+
+func search_patient_id(patients patient_tab, x string) int { //sequential search disini
+	for i := 0; i < patients.n; i++ {
+		if patients.data[i].id == x {
+			return i
+		}
+	}
+	return -1
+}
+
+func search_mcu_id(mcues mcu_tab, x string) int { //sequential search disini
+	for i := 0; i < mcues.n; i++ {
+		if mcues.data[i].id == x {
+			return i
+		}
+	}
+	return -1
 }
 
 func sort_period(mcues *mcu_tab) { //selection sort ada disini
@@ -221,12 +250,12 @@ func sort_pack(mcues *mcu_tab) { //selection sort ada disini
 	}
 }
 
-func sort_patient_id(patients *patient_tab) { //insertion sort ada disini
+func sort_patient_name(patients *patient_tab) { //insertion sort ada disini
 	for i := 1; i < patients.n; i++ {
 		key := patients.data[i]
 		j := i - 1
 
-		for j >= 0 && patients.data[j].id > key.id {
+		for j >= 0 && patients.data[j].name > key.name {
 			patients.data[j+1] = patients.data[j]
 			j--
 		}
@@ -277,6 +306,17 @@ func print_patient_detail(x info_patient) { // buat print detail satu pasien
 	fmt.Printf("Origin: %s\n", x.origin)
 	fmt.Printf("Age: %d\n", x.age)
 	fmt.Printf("Gender: %s\n", x.gender)
+	fmt.Println("--------------")
+}
+
+func print_mcu_detail(mcu info_mcu) {
+	fmt.Println("MCU Details:")
+	fmt.Printf("MCU ID: %s\n", mcu.id)
+	fmt.Printf("Price: %.2f\n", mcu.price)
+	fmt.Printf("Period: %s\n", mcu.period)
+	fmt.Printf("Patient Name: %s\n", mcu.patient.name)
+	fmt.Printf("Pack Name: %s\n", mcu.pack.name)
+	fmt.Println("--------------")
 }
 
 func print_cmd_main() {
@@ -284,8 +324,9 @@ func print_cmd_main() {
 	fmt.Println("2. View patients")
 	fmt.Println("3. View packs")
 	fmt.Println("4. Make medical check up")
-	fmt.Println("5. Search data")
-	fmt.Println("6. Edit data")
+	fmt.Println("5. Finish medical check up")
+	fmt.Println("6. Search data")
+	fmt.Println("7. Edit data")
 	fmt.Println("0. Exit program")
 	fmt.Println("--------------------------------------------")
 	fmt.Print("Input : ")
@@ -335,7 +376,7 @@ func register_mcu(mcues *mcu_tab, packs pack_tab, patients patient_tab) {
 		fmt.Printf("%d. %s\n", i+1, patients.data[i].name)
 	}
 
-	// Prompt user to select a patient
+	// select patient
 	var selectedPatientIndex int
 	fmt.Print("Select a patient (enter the corresponding number): ")
 	fmt.Scan(&selectedPatientIndex)
@@ -363,4 +404,171 @@ func register_mcu(mcues *mcu_tab, packs pack_tab, patients patient_tab) {
 	add_mcu(mcues, newMCU)
 
 	fmt.Printf("Medical Check-up successfully registered. MCU ID: %s\n", newMCU.id)
+}
+
+func finish_mcu(mcues *mcu_tab) {
+	var mcuID string
+	fmt.Print("Enter the MCU id: ")
+	fmt.Scan(&mcuID)
+	index := search_mcu_id(*mcues, mcuID)
+
+	if index != -1 { // kalo ketemu mcu nya masuk ke if ini
+		print_mcu_detail(mcues.data[index]) //print detail mcu sebelom di hapus
+
+		remove_mcu(mcues, index) //buat hapus mcu
+
+		fmt.Println("MCU finished and removed.")
+	} else {
+		fmt.Println("MCU with ID", mcuID, "not found.")
+	}
+}
+
+func search_menu(mcues mcu_tab, patients patient_tab) {
+	var input int = 99
+	for input != 0 {
+		fmt.Println("Search Menu:")
+		fmt.Println("1. Search patients by pack")
+		fmt.Println("2. Search patients by period")
+		fmt.Println("3. Search patient by ID")
+		fmt.Println("0. Return")
+		fmt.Println("--------------------------------------------")
+
+		fmt.Print("Input: ")
+		fmt.Scan(&input)
+
+		if input == 0 {
+			fmt.Println("Exiting search menu.")
+			break
+		} else if input == 1 {
+			var packID string
+			fmt.Print("Enter pack ID: ")
+			fmt.Scan(&packID)
+			search_patient_from_pack(mcues, packID)
+		} else if input == 2 {
+			var period string
+			fmt.Print("Enter period: ")
+			fmt.Scan(&period)
+			search_patient_from_period(mcues, period)
+		} else if input == 3 {
+			var patientID string
+			fmt.Print("Enter patient ID: ")
+			fmt.Scan(&patientID)
+			search_patient_name(patients, patientID)
+		} else {
+			fmt.Println("Invalid input. Please enter a number between 0 and 3.")
+		}
+	}
+}
+
+func edit_menu(packs *pack_tab, patients *patient_tab) {
+	var input int = 99
+	for input != 0 {
+		fmt.Println("Edit Menu:")
+		fmt.Println("1. Add patient")
+		fmt.Println("2. Add pack")
+		fmt.Println("3. Remove patient")
+		fmt.Println("4. Remove pack")
+		fmt.Println("5. Edit patient")
+		fmt.Println("6. Edit pack")
+		fmt.Println("0. Return")
+		fmt.Println("--------------------------------------------")
+		fmt.Print("input: ")
+		fmt.Scan(&input)
+
+		if input == 0 {
+			fmt.Println("Exiting edit menu.")
+		} else if input == 1 {
+			var newPatient info_patient
+			newPatient = get_input_patient()
+			add_patient(&*patients, newPatient)
+		} else if input == 2 {
+			var newPack info_pack
+			newPack = get_input_pack()
+			add_pack(&*packs, newPack)
+		} else if input == 3 {
+			var patientID string
+			fmt.Print("Enter patient ID to remove: ")
+			fmt.Scan(&patientID)
+			index := search_patient_id(*patients, patientID)
+			if index != -1 {
+				remove_patient(patients, index)
+			} else {
+				fmt.Println("Patient not found.")
+			}
+		} else if input == 4 {
+			var packID string
+			fmt.Print("Enter pack ID to remove: ")
+			fmt.Scan(&packID)
+			index := search_pack_id(*packs, packID)
+			if index != -1 {
+				remove_pack(packs, index)
+			} else {
+				fmt.Println("Pack not found.")
+			}
+		} else if input == 5 {
+			var patientID string
+			fmt.Print("Enter patient ID to edit: ")
+			fmt.Scan(&patientID)
+			index := search_patient_id(*patients, patientID)
+			if index != -1 {
+				fmt.Printf("Editing %s\n", patients.data[index].name)
+				var newPatient info_patient
+				newPatient = get_input_patient()
+				patients.data[index] = newPatient
+			} else {
+				fmt.Println("Patient not found.")
+			}
+		} else if input == 6 {
+			var packID string
+			fmt.Print("Enter pack ID to edit: ")
+			fmt.Scan(&packID)
+			index := search_pack_id(*packs, packID)
+			if index != -1 {
+				fmt.Printf("Editing %s\n", packs.data[index].name)
+				var newPack info_pack
+				newPack = get_input_pack()
+				packs.data[index] = newPack
+			} else {
+				fmt.Println("Pack not found.")
+			}
+		} else {
+			fmt.Println("Invalid input. Please enter a number between 0 and 6.")
+		}
+	}
+}
+
+func get_input_patient() info_patient {
+	var newPatient info_patient
+
+	fmt.Print("Enter patient name: ")
+	fmt.Scan(&newPatient.name)
+
+	fmt.Print("Enter patient ID: ")
+	fmt.Scan(&newPatient.id)
+
+	fmt.Print("Enter patient origin: ")
+	fmt.Scan(&newPatient.origin)
+
+	fmt.Print("Enter patient age: ")
+	fmt.Scan(&newPatient.age)
+
+	fmt.Print("Enter patient gender: ")
+	fmt.Scan(&newPatient.gender)
+
+	return newPatient
+}
+
+func get_input_pack() info_pack {
+	var newPack info_pack
+
+	fmt.Print("Enter pack name: ")
+	fmt.Scan(&newPack.name)
+
+	fmt.Print("Enter pack ID: ")
+	fmt.Scan(&newPack.id)
+
+	fmt.Print("Enter pack category: ")
+	fmt.Scan(&newPack.category)
+
+	return newPack
 }
