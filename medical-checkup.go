@@ -50,7 +50,7 @@ func main() {
 	var packs pack_tab
 	var mcues mcu_tab
 	var input int = 99
-	for input != 7 {
+	for input != 0 {
 		fmt.Println("------------ Medical Data ------------------")
 		print_cmd_main()
 		fmt.Scan(&input)
@@ -72,12 +72,15 @@ func main() {
 			fmt.Println("Exiting program")
 		} else {
 			fmt.Println("Invalid input. Please enter a number between 0 and 7.")
-			fmt.Scanln()
 		}
 	}
 }
 
 func view_mcues(mcues mcu_tab) {
+	if mcues.n == 0 {
+		fmt.Println("No MCU listed yet")
+		return
+	}
 	var input int = 99
 	for input != 0 {
 		fmt.Println("----------------- MCU ----------------------")
@@ -97,17 +100,21 @@ func view_mcues(mcues mcu_tab) {
 }
 
 func view_patients(patients patient_tab) {
+	if patients.n == 0 {
+		fmt.Println("No patient listed yet")
+		return
+	}
 	fmt.Println("--------------- Patient --------------------")
 	print_all_patient(patients)
-	fmt.Print("Press anywhere to return")
-	fmt.Scanln()
 }
 
 func view_packs(packs pack_tab) {
+	if packs.n == 0 {
+		fmt.Println("No pack listed yet")
+		return
+	}
 	fmt.Println("---------------- Packs ---------------------")
 	print_all_packs(packs)
-	fmt.Print("Press anywhere to return")
-	fmt.Scanln()
 }
 
 func add_patient(patients *patient_tab, x info_patient) { //buat nambahin data pasien
@@ -453,7 +460,8 @@ func search_menu(mcues mcu_tab, patients patient_tab) {
 			var patientID string
 			fmt.Print("Enter patient ID: ")
 			fmt.Scan(&patientID)
-			search_patient_name(patients, patientID)
+			index := search_patient_id(patients, patientID)
+			print_patient_detail(patients.data[index])
 		} else {
 			fmt.Println("Invalid input. Please enter a number between 0 and 3.")
 		}
@@ -463,6 +471,7 @@ func search_menu(mcues mcu_tab, patients patient_tab) {
 func edit_menu(packs *pack_tab, patients *patient_tab) {
 	var input int = 99
 	for input != 0 {
+		fmt.Println("--------------------------------------------")
 		fmt.Println("Edit Menu:")
 		fmt.Println("1. Add patient")
 		fmt.Println("2. Add pack")
@@ -476,15 +485,18 @@ func edit_menu(packs *pack_tab, patients *patient_tab) {
 		fmt.Scan(&input)
 
 		if input == 0 {
-			fmt.Println("Exiting edit menu.")
+			fmt.Println("returning to main menu.")
+			return
 		} else if input == 1 {
 			var newPatient info_patient
 			newPatient = get_input_patient()
 			add_patient(&*patients, newPatient)
+			fmt.Println("New patient added")
 		} else if input == 2 {
 			var newPack info_pack
 			newPack = get_input_pack()
 			add_pack(&*packs, newPack)
+			fmt.Println("New pack added")
 		} else if input == 3 {
 			var patientID string
 			fmt.Print("Enter patient ID to remove: ")
@@ -492,6 +504,7 @@ func edit_menu(packs *pack_tab, patients *patient_tab) {
 			index := search_patient_id(*patients, patientID)
 			if index != -1 {
 				remove_patient(patients, index)
+				fmt.Println("Patient deleted")
 			} else {
 				fmt.Println("Patient not found.")
 			}
@@ -502,6 +515,7 @@ func edit_menu(packs *pack_tab, patients *patient_tab) {
 			index := search_pack_id(*packs, packID)
 			if index != -1 {
 				remove_pack(packs, index)
+				fmt.Println("Pack deleted")
 			} else {
 				fmt.Println("Pack not found.")
 			}
@@ -515,6 +529,7 @@ func edit_menu(packs *pack_tab, patients *patient_tab) {
 				var newPatient info_patient
 				newPatient = get_input_patient()
 				patients.data[index] = newPatient
+				fmt.Println("Patient edited")
 			} else {
 				fmt.Println("Patient not found.")
 			}
@@ -528,6 +543,7 @@ func edit_menu(packs *pack_tab, patients *patient_tab) {
 				var newPack info_pack
 				newPack = get_input_pack()
 				packs.data[index] = newPack
+				fmt.Println("Pack edited")
 			} else {
 				fmt.Println("Pack not found.")
 			}
