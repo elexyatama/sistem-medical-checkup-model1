@@ -85,6 +85,11 @@ func view_mcues(mcues mcu_tab) {
 	for input != 0 {
 		fmt.Println("----------------- MCU ----------------------")
 		print_all_mcu(mcues)
+		fmt.Println("1. Sort by period")
+		fmt.Println("2. Sort by pack")
+		fmt.Println("0. Return to main menu")
+		fmt.Println("--------------------------------------------")
+		fmt.Print("Input : ")
 		fmt.Scan(&input)
 		if input == 1 {
 			sort_period(&mcues)
@@ -94,7 +99,6 @@ func view_mcues(mcues mcu_tab) {
 			fmt.Println("Returning to main menu")
 		} else {
 			fmt.Println("Unknown input")
-			fmt.Scanln()
 		}
 	}
 }
@@ -461,7 +465,11 @@ func search_menu(mcues mcu_tab, patients patient_tab) {
 			fmt.Print("Enter patient ID: ")
 			fmt.Scan(&patientID)
 			index := search_patient_id(patients, patientID)
-			print_patient_detail(patients.data[index])
+			if index != -1 {
+				print_patient_detail(patients.data[index])
+			} else {
+				fmt.Println("Invalid ID")
+			}
 		} else {
 			fmt.Println("Invalid input. Please enter a number between 0 and 3.")
 		}
